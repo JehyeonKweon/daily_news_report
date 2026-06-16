@@ -28,7 +28,6 @@ import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
-# 헤터의 유저 에이전트를 추가함으로서 봇 트래픽으로 필터되지 않게 함
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -37,7 +36,6 @@ REQUEST_HEADERS = {
 }
 
 
-# 데이터를 저장하기 위한 클래스 정의
 @dataclass
 class Article:
     topic: str
@@ -227,10 +225,9 @@ def build_summarizer(cfg: dict):
         """Return (translated_title, summary), both written in `language`."""
         content = text if text else title
         prompt = (
-            f"You are given an English news article. Respond in {language}.\n"
+            f"You are cybersecurity professional who are researching cybersecurity trends by readingnews article.\n"
             f"1) Translate the title into {language}.\n"
-            f"2) Summarize the article in 2-3 concise, factual, neutral "
-            f"sentences in {language}. Do not add a preamble.\n\n"
+            f"2) Summarize the article in 3-5 concise, factual, neutral sentences in {language}.\n\n"
             "Respond in EXACTLY this format, nothing else:\n"
             "TITLE: <translated title>\n"
             "SUMMARY: <summary>\n\n"
