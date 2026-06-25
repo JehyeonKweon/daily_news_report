@@ -223,6 +223,14 @@ def build_summarizer(cfg: dict):
 
     def summarize(title: str, text: str) -> tuple[str, str]:
         """Return (translated_title, summary), both written in `language`."""
+        system_prompt = (
+            "You are an expert Cyber Threat Intelligence (CTI) analyst working for Hunesion (휴네시온), "
+            "a company specializing in Network Isolation / Cross-Domain Solutions (망연계 - i-oneNet), "
+            "Systems Access Control (접근제어 - NGS), and Public/Financial sector infrastructure security.\n\n"
+            "Your role is to strictly analyze raw threat data, filtering heavily for corporate relevance "
+            "and eliminating outside knowledge or hallucinated details."
+        )
+
         content = text if text else title
         prompt = (
             f"You are cybersecurity professional who are researching cybersecurity trends by readingnews article.\n"
@@ -230,7 +238,7 @@ def build_summarizer(cfg: dict):
             f"2) Summarize the article in 3-5 concise, factual, neutral sentences in {language}.\n\n"
             "Respond in EXACTLY this format, nothing else:\n"
             "TITLE: <translated title>\n"
-            "SUMMARY: <summary>\n\n"
+            "SUMMARY: <scale>\n<summary>\n\n"
             f"Article title: {title}\n\nArticle body:\n{content}"
         )
         last_exc = None
@@ -352,7 +360,9 @@ def main() -> None:
     grouped: dict[str, list[Article]] = {}
     for label, query in cfg["topics"]:
         print(f"Fetching: {label}")
-        articles = fetch_topic_news(query, cfg)
+        articles = fetch_topic_news(query+'AND (site: "bleepingcomputer.com" OR site:"securityweek.com" OR site:"thehackernews.com" OR site:"krebsonsecurity.com" OR site:"therecord.media" OR site:"darkreading.com" OR site:"cisa.gov")', cfg)
+        articles += fetch_topic_news('("데이터 유출" OR "랜섬웨어" OR "제로 데이" OR "취약점") AND ("기업" OR "회사" OR "사업") AND (site:boannews.com OR site:dailysecu.com)', {'country': 'KR', 'lang': 'kr-KR', 'per_topic': 10})
+        print(articles)
         kept: list[Article] = []
         skipped_kw = skipped_dup = 0
         for a in articles:
