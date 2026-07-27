@@ -1,0 +1,23 @@
+# One domain per line. Lines starting with # are comments.
+boannews.com
+dailysecu.com
+ddaily.co.kr
+zdnet.co.kr
+boho.or.kr
+yna.co.kr
+news1.kr
+kbs.co.kr
+sbs.co.kr
+mbc.co.kr
+jtbc.co.kr
+hankyung.com
+mk.co.kr
+sedaily.com
+mt.co.kr
+newsis.com
+chosun.com
+joongang.co.kr
+donga.com
+hani.co.kr
+khan.co.kr
+aitimes.kr

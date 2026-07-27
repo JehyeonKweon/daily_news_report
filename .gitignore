@@ -4,8 +4,16 @@
 # Generated output
 latest_report.html
 
+# Web board history
+data/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
 # Python
 __pycache__/
+**/__pycache__/
 *.py[cod]
 *.egg-info/
 .venv/

@@ -1,0 +1,4 @@
+label: 해외 보안 뉴스
+
+("ransomware" OR "data breach" OR "zero day" OR "vulnerability")
+AND ("enterprise" OR "corporate" OR "business")

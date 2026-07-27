@@ -1,0 +1,4 @@
+label: 국내 AI 뉴스
+
+("인공지능" OR "AI" OR "머신러닝" OR "LLM")
+AND ("위험" OR "유출" OR "사고")

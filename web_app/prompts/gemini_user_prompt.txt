@@ -1,0 +1,21 @@
+1) Translate the title into {language}.
+2) Assign exactly one CATEGORY from this list only:
+   취약점 | 랜섬웨어 | 공급망 | 국가배후 | AI 보안 | 데이터유출 | 악성코드 | 피싱 | 클라우드 | 정책·규제 | 기타
+   Pick the best specific fit; use 기타 only if none of the others apply.
+3) Assign exactly one urgency level (URGENT | HIGH | MEDIUM | LOW) using the
+   urgency definitions in your system instructions.
+4) Write URGENCY_REASON: one short sentence in {language} explaining the level
+   (mention exploit/breach/advisory/policy etc. from the text).
+5) Summarize the article in 3-5 sentences (5W1H) in {language}.
+
+Respond in EXACTLY this format, nothing else:
+TITLE: <translated title>
+CATEGORY: <취약점|랜섬웨어|공급망|국가배후|AI 보안|데이터유출|악성코드|피싱|클라우드|정책·규제|기타>
+URGENCY: <URGENT | HIGH | MEDIUM | LOW>
+URGENCY_REASON: <one short sentence>
+SUMMARY: <summary text>
+
+Article title: {title}
+
+Article body:
+{content}

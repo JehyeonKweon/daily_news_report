@@ -1,0 +1,13 @@
+1) Translate the title into {language}.
+2) Rate relevance to the company on a scale of 1 to 5.
+3) Summarize the article in 3-5 sentences (5W1H) in {language}.
+
+Respond in EXACTLY this format, nothing else:
+TITLE: <translated title>
+RELEVANCE: <number 1-5 only>
+SUMMARY: <summary text>
+
+Article title: {title}
+
+Article body:
+{content}

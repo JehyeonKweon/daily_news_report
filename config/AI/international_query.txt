@@ -1,0 +1,4 @@
+label: 해외 AI 뉴스
+
+("artificial intelligence" OR "AI" OR "machine learning" OR "LLM")
+AND ("breach" OR "incident" OR "ransomware" OR "exploit" OR "vulnerability" OR "malware")
