@@ -165,23 +165,6 @@ python -m uvicorn web_app.app:app --host 0.0.0.0 --port 8000
 
 Allow port **8000** in Windows Firewall if others cannot connect. After UI changes, rebuild `frontend` and hard-refresh the browser.
 
-### Hosted on GitHub Pages (auto-updating)
-
-`.github/workflows/pages.yml` publishes a **read-only** copy of the board to GitHub Pages every 3 hours, on every push to `main`, and on demand:
-
-1. Build the UI in static mode (`npm run build:static`)
-2. Restore the previous `api/history.json` from the live site
-3. Fetch whitelist RSS feeds and score new articles with Gemini (`python -m web_app.build_static frontend/dist`)
-4. Deploy `frontend/dist` to Pages
-
-One-time setup in the GitHub repo:
-
-1. **Settings → Secrets and variables → Actions → New repository secret**: `GEMINI_API_KEY`
-2. **Settings → Pages → Build and deployment → Source**: `GitHub Actions`
-3. **Actions → Publish board to GitHub Pages → Run workflow**
-
-The hosted page has no Refresh, Score now, or add/remove source buttons — edit `config/international_sites.txt` and push to change sources. Open tabs re-check for new data every 5 minutes. GitHub pauses scheduled workflows in public repos after 60 days without commits; re-enable from the Actions tab.
-
 ### API
 
 | Endpoint | Purpose |

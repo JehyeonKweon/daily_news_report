@@ -6,7 +6,6 @@ import {
   fetchSites,
   refreshArticles,
   removeSite,
-  STATIC_MODE,
   summarizeArticle,
   type Article,
   type ArticlesResponse,
@@ -17,8 +16,6 @@ import {
 } from "./api";
 
 const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const;
-
-const STATIC_POLL_MS = 5 * 60 * 1000;
 
 const CATEGORY_KEYS = [
   "취약점",
@@ -601,15 +598,6 @@ export default function App() {
   }, [load]);
 
   useEffect(() => {
-    if (!STATIC_MODE) return;
-    // Scheduled workflow republishes the snapshot; pick it up without a page reload.
-    const timer = setInterval(() => {
-      fetchArticles().then(applyArticlesPayload).catch(() => {});
-    }, STATIC_POLL_MS);
-    return () => clearInterval(timer);
-  }, [applyArticlesPayload]);
-
-  useEffect(() => {
     const onScroll = () => setShowTop(window.scrollY > 400);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -698,18 +686,16 @@ export default function App() {
             last refresh {formatUpdatedAt(data?.updated_at ?? "")}
           </p>
           <div className="header-actions">
-            {!STATIC_MODE && (
-              <button
-                type="button"
-                className="icon-btn primary"
-                title="Refresh + score new"
-                aria-label="Refresh and score new"
-                disabled={refreshing || scoring || loading}
-                onClick={() => void onRefresh()}
-              >
-                {refreshing ? "…" : "↻"}
-              </button>
-            )}
+            <button
+              type="button"
+              className="icon-btn primary"
+              title="Refresh + score new"
+              aria-label="Refresh and score new"
+              disabled={refreshing || scoring || loading}
+              onClick={() => void onRefresh()}
+            >
+              {refreshing ? "…" : "↻"}
+            </button>
             <button
               type="button"
               className="icon-btn"
@@ -761,44 +747,40 @@ export default function App() {
                     </span>
                   )}
                 </div>
-                {!STATIC_MODE && (
-                  <button
-                    type="button"
-                    className="site-x"
-                    title={`Remove ${site.domain}`}
-                    aria-label={`Remove ${site.domain}`}
-                    disabled={sitesBusy}
-                    onClick={() => void onRemoveSite(site.domain)}
-                  >
-                    ×
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="site-x"
+                  title={`Remove ${site.domain}`}
+                  aria-label={`Remove ${site.domain}`}
+                  disabled={sitesBusy}
+                  onClick={() => void onRemoveSite(site.domain)}
+                >
+                  ×
+                </button>
               </li>
             ))}
             {sites.length === 0 && (
               <li className="empty">No sources yet. Paste an RSS URL below.</li>
             )}
           </ul>
-          {!STATIC_MODE && (
-            <form
-              className="sites-add"
-              onSubmit={(e) => {
-                e.preventDefault();
-                void onAddSite();
-              }}
-            >
-              <input
-                type="url"
-                placeholder="https://example.com/feed/"
-                value={newFeedUrl}
-                onChange={(e) => setNewFeedUrl(e.target.value)}
-                disabled={sitesBusy}
-              />
-              <button type="submit" className="btn small" disabled={sitesBusy}>
-                {sitesBusy ? "…" : "Add"}
-              </button>
-            </form>
-          )}
+          <form
+            className="sites-add"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void onAddSite();
+            }}
+          >
+            <input
+              type="url"
+              placeholder="https://example.com/feed/"
+              value={newFeedUrl}
+              onChange={(e) => setNewFeedUrl(e.target.value)}
+              disabled={sitesBusy}
+            />
+            <button type="submit" className="btn small" disabled={sitesBusy}>
+              {sitesBusy ? "…" : "Add"}
+            </button>
+          </form>
         </section>
       )}
 
@@ -1078,7 +1060,7 @@ function ArticleRow({
       )}
 
       <div className="card-foot">
-        {!scored && !STATIC_MODE ? (
+        {!scored ? (
           <button
             type="button"
             className="btn secondary small"

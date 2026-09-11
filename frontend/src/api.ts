@@ -93,9 +93,6 @@ export type SiteMutationResponse = {
 
 const API_BASE = "";
 
-/** `vite build --mode static` (GitHub Pages): read-only, reads a published JSON snapshot. */
-export const STATIC_MODE = import.meta.env.MODE === "static";
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, init);
   if (!res.ok) {
@@ -113,9 +110,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export function fetchArticles(): Promise<ArticlesResponse> {
-  if (STATIC_MODE) {
-    return request<ArticlesResponse>(`./api/articles.json?t=${Date.now()}`);
-  }
   return request<ArticlesResponse>("/api/articles");
 }
 
