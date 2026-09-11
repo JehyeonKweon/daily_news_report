@@ -10,7 +10,7 @@ from core.models import LogFn
 
 MAX_RETRIES = 4
 RETRY_BASE_DELAY = 10
-MIN_GEMINI_INTERVAL_SECONDS = 20  # min seconds per Gemini call (RPM buffer for free tier)
+MIN_GEMINI_INTERVAL_SECONDS = 5  # min seconds per Gemini call (RPM buffer for free tier)
 
 _URGENCY_VALUES = ("URGENT", "HIGH", "MEDIUM", "LOW")
 

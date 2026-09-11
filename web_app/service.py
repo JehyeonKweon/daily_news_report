@@ -139,12 +139,31 @@ def resolve_publisher_links(article_ids: list[str] | None = None) -> int:
     return updated
 
 
-def _dedupe_articles(articles: list, *, threshold: float) -> tuple[list, int]:
-    """Keep first unique titles; skip near-duplicates (current Jaccard)."""
+def _dedupe_articles(
+    articles: list,
+    *,
+    threshold: float,
+    existing_tokens: list[set[str]] | None = None,
+    keep_ids: set[str] | None = None,
+) -> tuple[list, int]:
+    """Keep first unique titles; skip near-duplicates (Jaccard).
+
+    ``existing_tokens`` seeds comparison with titles already on the board so a
+    later outlet's take on the same story is skipped even if the earlier card
+    is not in this RSS batch.
+
+    ``keep_ids``: article ids already stored — always kept for upsert/refresh
+    (they are not counted as skipped duplicates).
+    """
     unique = []
-    seen_tokens: list[set[str]] = []
+    seen_tokens: list[set[str]] = list(existing_tokens or [])
+    known_ids = keep_ids or set()
     skipped = 0
     for article in articles:
+        aid = article_id_from_guid_or_link(article.guid, article.link, article.title)
+        if aid in known_ids:
+            unique.append(article)
+            continue
         tokens = title_tokens(article.title)
         if is_duplicate(tokens, seen_tokens, threshold):
             skipped += 1
@@ -201,18 +220,18 @@ def add_board_site(domain: str, feed_url: str, *, fetch_now: bool = True) -> dic
             recent = filter_recent(result.articles, age_days)
             cfg = load_base_config()
             ensure_loaded()
-            existing_tokens = [
-                title_tokens(a.title) for a in get_state().sorted_list()
-            ]
-            kept = []
-            for article in recent:
-                tokens = title_tokens(article.title)
-                if cfg["dedupe"] and is_duplicate(
-                    tokens, existing_tokens, cfg["dedupe_threshold"]
-                ):
-                    continue
-                existing_tokens.append(tokens)
-                kept.append(article)
+            state = get_state()
+            if cfg["dedupe"]:
+                kept, _ = _dedupe_articles(
+                    recent,
+                    threshold=cfg["dedupe_threshold"],
+                    existing_tokens=[
+                        title_tokens(a.title) for a in state.articles.values()
+                    ],
+                    keep_ids=set(state.articles.keys()),
+                )
+            else:
+                kept = recent
             items = []
             seen: set[str] = set()
             for a in kept:
@@ -283,9 +302,16 @@ def refresh_international_security(*, summarize_new: bool = True) -> dict:
         reverse=True,
     )
 
+    state = get_state()
+    existing_ids = set(state.articles.keys())
+    existing_tokens = [title_tokens(a.title) for a in state.articles.values()]
+
     if cfg["dedupe"]:
         unique, skipped_dup = _dedupe_articles(
-            recent, threshold=cfg["dedupe_threshold"]
+            recent,
+            threshold=cfg["dedupe_threshold"],
+            existing_tokens=existing_tokens,
+            keep_ids=existing_ids,
         )
     else:
         unique, skipped_dup = recent, 0

@@ -3,9 +3,11 @@
    취약점 | 랜섬웨어 | 공급망 | 국가배후 | AI 보안 | 데이터유출 | 악성코드 | 피싱 | 클라우드 | 정책·규제 | 기타
    Pick the best specific fit; use 기타 only if none of the others apply.
 3) Assign exactly one urgency level (URGENT | HIGH | MEDIUM | LOW) using the
-   urgency definitions in your system instructions.
+   urgency definitions in your system instructions. Prefer the lower level when
+   unsure. URGENT only if the text clearly shows in-the-wild exploitation,
+   KEV/known-exploited status, or an ongoing breach/outage — not CVSS alone.
 4) Write URGENCY_REASON: one short sentence in {language} explaining the level
-   (mention exploit/breach/advisory/policy etc. from the text).
+   (cite exploit status / breach / advisory / policy from the text).
 5) Summarize the article in 3-5 sentences (5W1H) in {language}.
 
 Respond in EXACTLY this format, nothing else:

@@ -23,24 +23,39 @@ Category guidance:
 - 정책·규제 — law, regulation, compliance, government cyber policy.
 - 기타 — only when none of the above fit (opinion, market, hiring, vague trend).
 
-Urgency level definitions (use exactly one):
+Urgency level definitions (use exactly one). Be conservative: URGENT must stay rare.
+Default downward when evidence is weak or missing. Do not inflate severity from
+CVSS alone, "critical" wording, or "patch recommended" without exploit/breach proof.
 
-URGENT — Act immediately (hours):
-- Active exploitation in the wild, ransomware currently disrupting operations,
-  or a critical zero-day with public exploit code and high impact.
-- Ongoing breach / production outage caused by an attack that needs containment now.
+URGENT — Act immediately (hours). Use ONLY if the article explicitly states at
+least one of:
+- Active exploitation in the wild, mass scanning, or listing in CISA KEV /
+  equivalent "known exploited" advisory with a short patch deadline.
+- Ransomware or attack currently disrupting production / OT / critical services.
+- Ongoing breach or containment emergency (credentials still exposed, malware
+  still spreading in live environments named in the text).
+Do NOT use URGENT for: critical CVE with no exploitation mentioned, public PoC /
+Metasploit module alone, vendor patch advisory, phishing kit feature updates,
+or broad threat-trend pieces.
 
 HIGH — Act this week:
-- Serious vulnerability or confirmed breach with clear remediation path,
-  but not described as actively exploited right now.
-- Important vendor/security advisory for widely used enterprise software,
-  or a significant incident affecting peers in critical infrastructure / finance.
+- Critical or high-impact vulnerability / RCE / auth bypass in widely used
+  enterprise software with a clear remediation, but NOT described as exploited
+  in the wild yet (including public PoC without confirmed attacks).
+- Confirmed breach, data theft, or significant supply-chain compromise with
+  remediation steps, where urgency is days not hours.
+- Important vendor/security advisory for enterprise or critical-infrastructure
+  peers.
 
 MEDIUM — Review when practical:
-- Notable security news with limited immediate action for most teams
-  (e.g. niche product, regional incident, investigation updates).
-- Useful context for monitoring, but not a patch-now emergency.
+- Notable campaigns, malware/phishing tooling updates, regional incidents,
+  investigation updates, or niche-product issues.
+- Useful monitoring context without a clear "patch/contain this week" action
+  for most enterprise teams.
+- Nation-state attribution, joint advisories, or strategic threat reporting
+  without an immediate enterprise remediation deadline.
 
 LOW — Informational / awareness:
-- Policy, regulation, opinion, market, hiring, or high-level trend pieces.
-- Recaps with no actionable vulnerability or incident for operators.
+- Policy, regulation, opinion, market, hiring, product launches, or high-level
+  trend / AI-crime narrative pieces with no actionable vuln or incident.
+- Recaps and awareness articles for operators.

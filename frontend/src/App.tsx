@@ -93,14 +93,21 @@ const URGENCY_RANK: Record<string, number> = {
 };
 
 const URGENCY_COLORS: Record<UrgencyKey, string> = {
-  URGENT: "#b42318",
-  HIGH: "#b54708",
-  MEDIUM: "#ca8a04",
-  LOW: "#027a48",
+  URGENT: "#ff5d4f",
+  HIGH: "#ff8c42",
+  MEDIUM: "#e7c73c",
+  LOW: "#4d78ff",
 };
 
 type SortField = "date" | "title" | "urgency" | "source";
 type SortDir = "asc" | "desc";
+
+const SORT_FIELDS: readonly (readonly [SortField, string])[] = [
+  ["date", "날짜"],
+  ["title", "제목"],
+  ["urgency", "긴급도"],
+  ["source", "출처"],
+] as const;
 
 function formatUpdatedAt(iso: string): string {
   if (!iso) return "—";
@@ -384,10 +391,6 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [urgencyFilter, setUrgencyFilter] = useState<string>("ALL");
   const [categoryFilter, setCategoryFilter] = useState<string>("ALL");
-  const [dashMode, setDashMode] = useState<"urgency" | "category">(() => {
-    const saved = localStorage.getItem("board-dash-mode");
-    return saved === "category" ? "category" : "urgency";
-  });
   const [sortField, setSortField] = useState<SortField>(() => {
     const saved = localStorage.getItem("board-sort-field");
     if (saved === "date" || saved === "title" || saved === "urgency" || saved === "source") {
@@ -672,14 +675,11 @@ export default function App() {
   };
 
   return (
-    <div className="page">
-      <header className="header">
+    <>
+      <header className="topbar">
         <div className="brand">
           <span className="logo-mark">C/</span>
-          <div>
-            <h1 className="logo-text">CYBER BOARD</h1>
-            <p className="brand-sub">해외 보안 뉴스</p>
-          </div>
+          <h1 className="logo-text">Cybersecurity News Report</h1>
         </div>
         <div className="header-right">
           <p className="refresh-stamp">
@@ -719,9 +719,10 @@ export default function App() {
         </div>
       </header>
 
+      <div className="page">
       {sitesOpen && (
         <section className="dash-card sites-card" aria-label="Whitelist sources">
-          <div className="dash-switch sites-title-row">
+          <div className="sites-title-row">
             <span className="sites-title">Sources</span>
             <span className="sites-sub">
               RSS whitelist · last {data?.article_max_age_days ?? 3} days
@@ -783,69 +784,43 @@ export default function App() {
         </section>
       )}
 
-      <section className="dash-card">
-        <div className="dash-switch" role="tablist" aria-label="Dashboard mode">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={dashMode === "urgency"}
-            className={dashMode === "urgency" ? "active" : ""}
-            onClick={() => {
-              setDashMode("urgency");
-              localStorage.setItem("board-dash-mode", "urgency");
-            }}
-          >
-            긴급도
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={dashMode === "category"}
-            className={dashMode === "category" ? "active" : ""}
-            onClick={() => {
-              setDashMode("category");
-              localStorage.setItem("board-dash-mode", "category");
-            }}
-          >
-            분류
-          </button>
+      <div className="section-head">
+        <div className="section-head-left">
+          <div>
+            <p className="section-eyebrow">Threat Overview</p>
+            <h2 className="section-title">위협 분포</h2>
+          </div>
         </div>
-        {dashMode === "urgency" ? (
-          <div className="charts">
-            <CountBarChart
-              slices={urgencySlices}
-              activeKey={urgencyFilter}
-              onSelect={onUrgencySelect}
-            />
-            <CountPieChart
-              slices={urgencySlices}
-              activeKey={urgencyFilter}
-              onSelect={onUrgencySelect}
-            />
-          </div>
-        ) : (
-          <div className="cat-chips" role="list" aria-label="Category filters">
-            {categoryChips.map((chip) => (
-              <button
-                key={chip.key}
-                type="button"
-                role="listitem"
-                className={`cat-chip ${categoryFilter === chip.key ? "active" : ""}`}
-                style={{ ["--chip-color" as string]: chip.color }}
-                onClick={() => onCategorySelect(chip.key)}
-              >
-                <span className="cat-chip-dot" />
-                <span className="cat-chip-label">{chip.label}</span>
-                <span className="cat-chip-count">{chip.value}</span>
-              </button>
-            ))}
-          </div>
-        )}
+      </div>
+
+      <section className="dash-card">
+        <div className="charts">
+          <CountBarChart
+            slices={urgencySlices}
+            activeKey={urgencyFilter}
+            onSelect={onUrgencySelect}
+          />
+          <CountPieChart
+            slices={urgencySlices}
+            activeKey={urgencyFilter}
+            onSelect={onUrgencySelect}
+          />
+        </div>
         <p className="chart-total">
-          <span className="chart-total-label">Total:</span>
+          <span className="chart-total-label">Total</span>
           <span className="chart-total-value">{data?.count ?? 0}</span>
         </p>
       </section>
+
+      <div className="section-head">
+        <div className="section-head-left">
+          <div>
+            <p className="section-eyebrow">Curated News Feed</p>
+            <h2 className="section-title">뉴스 브리핑</h2>
+          </div>
+        </div>
+        <span className="section-meta">{sorted.length}건</span>
+      </div>
 
       <div className="toolbar">
         <input
@@ -860,34 +835,25 @@ export default function App() {
         />
         <div className="sort-bar">
           <div className="sort-left">
-            <span className="sort-label">Sort</span>
-            {(
-              [
-                ["date", "date"],
-                ["title", "title"],
-                ["urgency", "urgency"],
-                ["source", "source"],
-              ] as const
-            ).map(([value, label]) => (
-              <label key={value} className="sort-radio">
-                <input
-                  type="radio"
-                  name="sort-field"
-                  checked={sortField === value}
-                  onChange={() => {
-                    setSortField(value);
-                    localStorage.setItem("board-sort-field", value);
-                    setPage(1);
-                  }}
-                />
+            <span className="sort-label">정렬</span>
+            {SORT_FIELDS.map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={`chip ${sortField === value ? "active" : ""}`}
+                onClick={() => {
+                  setSortField(value);
+                  localStorage.setItem("board-sort-field", value);
+                  setPage(1);
+                }}
+              >
                 {label}
-              </label>
+              </button>
             ))}
             <button
               type="button"
-              className="dir-btn"
-              title={sortDir === "asc" ? "오름차순" : "내림차순"}
-              aria-label="Toggle sort direction"
+              className={`chip dir-btn ${sortDir}`}
+              aria-label="정렬 방향 전환"
               onClick={() => {
                 const next = sortDir === "asc" ? "desc" : "asc";
                 setSortDir(next);
@@ -903,7 +869,6 @@ export default function App() {
               {pageItems.length}/{sorted.length}
             </span>
             <label className="page-size">
-              per page
               <select
                 value={pageSize}
                 onChange={(e) => {
@@ -919,7 +884,37 @@ export default function App() {
                   </option>
                 ))}
               </select>
+              개씩
             </label>
+          </div>
+        </div>
+
+        <div className="filter-row">
+          <span className="sort-label">주제</span>
+          <div className="cat-chips" role="list" aria-label="Category filters">
+            <button
+              type="button"
+              role="listitem"
+              className={`chip cat-chip ${categoryFilter === "ALL" ? "active" : ""}`}
+              onClick={() => onCategorySelect("ALL")}
+            >
+              <span className="cat-chip-label">전체</span>
+              <span className="cat-chip-count">{data?.count ?? 0}</span>
+            </button>
+            {categoryChips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                role="listitem"
+                className={`chip cat-chip ${categoryFilter === chip.key ? "active" : ""}`}
+                style={{ ["--chip-color" as string]: chip.color }}
+                onClick={() => onCategorySelect(chip.key)}
+              >
+                <span className="cat-chip-dot" />
+                <span className="cat-chip-label">{chip.label}</span>
+                <span className="cat-chip-count">{chip.value}</span>
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -982,6 +977,7 @@ export default function App() {
           </button>
         </div>
       )}
+      </div>
 
       {showTop && (
         <button
@@ -993,7 +989,7 @@ export default function App() {
           ↑
         </button>
       )}
-    </div>
+    </>
   );
 }
 
@@ -1027,7 +1023,10 @@ function ArticleRow({
             </span>
           )}
           {category && (
-            <span className={`badge cat cat-${CATEGORY_SLUG[category]}`}>
+            <span
+              className={`badge cat cat-${CATEGORY_SLUG[category]}`}
+              style={{ ["--cat-color" as string]: CATEGORY_COLORS[category] }}
+            >
               {category}
             </span>
           )}
@@ -1043,10 +1042,22 @@ function ArticleRow({
       {showOriginal && <div className="original">{original}</div>}
       {article.source && <div className="card-source">{article.source}</div>}
 
-      {article.urgency_reason && (
-        <p className="urgency-reason">{article.urgency_reason}</p>
+      {(article.urgency_reason || scored) && (
+        <div className="insight">
+          {article.urgency_reason && (
+            <div className="insight-row">
+              <span className="insight-label">판단</span>
+              <p>{article.urgency_reason}</p>
+            </div>
+          )}
+          {scored && (
+            <div className="insight-row">
+              <span className="insight-label accent">요약</span>
+              <p>{article.summary}</p>
+            </div>
+          )}
+        </div>
       )}
-      {scored && <p className="summary">{article.summary}</p>}
 
       <div className="card-foot">
         {!scored ? (
@@ -1062,7 +1073,8 @@ function ArticleRow({
           <span />
         )}
         <a className="ext-link" href={article.link} target="_blank" rel="noreferrer">
-          link to news ↗
+          원문 확인
+          <span aria-hidden="true">↗</span>
         </a>
       </div>
     </li>

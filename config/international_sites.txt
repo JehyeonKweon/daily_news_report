@@ -9,4 +9,3 @@ therecord.media | https://therecord.media/feed
 darkreading.com | https://www.darkreading.com/rss.xml
 cisa.gov | https://www.cisa.gov/news.xml
 securityweek.com | https://www.securityweek.com/feed/
-wired.com | https://www.wired.com/feed/category/security/latest/rss
